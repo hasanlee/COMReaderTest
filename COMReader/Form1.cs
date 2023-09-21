@@ -1,9 +1,11 @@
 using System.IO.Ports;
+using System.Text.RegularExpressions;
 
 namespace COMReader
 {
     public partial class Form1 : Form
     {
+        private bool stop = false;
         public Form1()
         {
             InitializeComponent();
@@ -53,10 +55,18 @@ namespace COMReader
 
         private void dataReceived(object sender, SerialDataReceivedEventArgs e)
         {
+            var regex = new Regex(txtRegexTemplate.Text);
             string data = SerialPortClient.serialPort.ReadExisting();
             txtData.Invoke(new Action(() =>
             {
-                txtData.Text += data;
+                if (chkUseRegex.Checked)
+                {
+                    txtData.Text += regex.Match(data).Groups[1].Value + "\n";
+                }
+                else
+                {
+                    txtData.Text += data + "\n";
+                }
             }));
         }
         private void CheckStatus()
@@ -83,6 +93,88 @@ namespace COMReader
                 lblStatus.ForeColor = Color.White;
             }
 
+        }
+
+        private void txtData_TextChanged(object sender, EventArgs e)
+        {
+            txtData.SelectionStart = txtData.Text.Length;
+            // scroll it automatically
+            txtData.ScrollToCaret();
+        }
+
+        private void btnSend_Click(object sender, EventArgs e)
+        {
+            string msg = txtMessage.Text;
+            SerialPortClient.Send(msg);
+            txtSentData.Text += msg + "\n";
+        }
+
+        private async void btnTestData_Click(object sender, EventArgs e)
+        {
+            btnTestData.Text = "Sending...";
+            int count = (int)nmCount.Value;
+            string template = txtTemplate.Text;
+            int sleep = (int)nmSleep.Value;
+            string msg = "";
+            var task = Task.Run(() =>
+            {
+                for (int i = 0; i < count; i++)
+                {
+                    if (stop)
+                    {
+                        stop = false;
+                        break;
+                    }
+                    string randomNumber = new Random().Next(0, 90000).ToString();
+                    if (chkAddAfter.Checked)
+                    {
+                        msg = template.Replace("{number}", randomNumber);
+                    }
+                    else
+                    {
+                        msg = randomNumber;
+                    }
+                    SerialPortClient.Send(msg);
+                    txtSentData.Invoke(new Action(() =>
+                    {
+                        txtSentData.Text += msg + "\n";
+                    }));
+                    Thread.Sleep(sleep);
+                }
+            });
+            await task;
+
+            if (task.Status == TaskStatus.RanToCompletion)
+            {
+                btnTestData.Text = "Send Test Data";
+            }
+        }
+
+        private void btnStop_Click(object sender, EventArgs e)
+        {
+            stop = true;
+        }
+
+        private void txtSentData_TextChanged(object sender, EventArgs e)
+        {
+            txtSentData.SelectionStart = txtData.Text.Length;
+            // scroll it automatically
+            txtSentData.ScrollToCaret();
+        }
+
+        private void btnClearSent_Click(object sender, EventArgs e)
+        {
+            txtSentData.Clear();
+        }
+
+        private void btnClearReceived_Click(object sender, EventArgs e)
+        {
+            txtData.Clear();
+        }
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            SerialPortClient.Close();
         }
     }
 }

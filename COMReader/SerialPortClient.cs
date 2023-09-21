@@ -14,6 +14,9 @@ namespace COMReader
         public static void Open(string port,int baudRate,Parity parity,int dataBits,StopBits stopBits)
         {
             serialPort = new SerialPort(port, baudRate, parity, dataBits, stopBits);
+            serialPort.Handshake = Handshake.None;
+            serialPort.ReadTimeout = 500;
+            serialPort.WriteTimeout = 500;
             try
             {
                 serialPort.Open();
@@ -31,6 +34,14 @@ namespace COMReader
             if (serialPort is not null)
             {
                 serialPort.Close();
+            }
+        }
+
+        public static void Send(string data)
+        {
+            if (serialPort is not null && serialPort.IsOpen)
+            {
+                serialPort.Write(data);
             }
         }
     }
