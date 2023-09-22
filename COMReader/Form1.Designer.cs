@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             cmbPorts = new ComboBox();
             cmbBaudrate = new ComboBox();
             cmbParity = new ComboBox();
@@ -377,8 +378,10 @@
             // 
             // txtSentData
             // 
+            txtSentData.DetectUrls = false;
             txtSentData.Location = new Point(8, 35);
             txtSentData.Name = "txtSentData";
+            txtSentData.ReadOnly = true;
             txtSentData.Size = new Size(372, 205);
             txtSentData.TabIndex = 7;
             txtSentData.Text = "";
@@ -421,6 +424,7 @@
             Controls.Add(label3);
             Controls.Add(label4);
             FormBorderStyle = FormBorderStyle.FixedToolWindow;
+            Icon = (Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
             MinimizeBox = false;
             MinimumSize = new Size(613, 409);

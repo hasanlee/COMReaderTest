@@ -97,9 +97,7 @@ namespace COMReader
 
         private void txtData_TextChanged(object sender, EventArgs e)
         {
-            txtData.SelectionStart = txtData.Text.Length;
-            // scroll it automatically
-            txtData.ScrollToCaret();
+            txtData.ScrollToBottom();
         }
 
         private void btnSend_Click(object sender, EventArgs e)
@@ -157,9 +155,7 @@ namespace COMReader
 
         private void txtSentData_TextChanged(object sender, EventArgs e)
         {
-            txtSentData.SelectionStart = txtData.Text.Length;
-            // scroll it automatically
-            txtSentData.ScrollToCaret();
+            txtSentData.ScrollToBottom();
         }
 
         private void btnClearSent_Click(object sender, EventArgs e)
